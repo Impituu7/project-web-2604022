@@ -1,3 +1,4 @@
 Nama : Raditya Fakhri Nararya
-NIM : 260402
-Bukti : Project berhasil dipulihkan dari remote repository. 
+NIM : 2604022
+Bukti : Project berhasil dipulihkan dari remote repository.
+Penjelasan : File ini dibuat dari working copy hasil clone pada Pertemuan 4.
