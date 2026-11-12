@@ -16,6 +16,7 @@
         <nav class="site-nav" aria-label="Navigasi utama">
             <ul>
                 <li><a href="#tentang">Tentang</a></li>
+                <li><a href="#registration">Cek Kursi</a></li>
                 <li><a href="#agenda">Agenda</a></li>
                 <li><a href="#manfaat">Manfaat</a></li>
                 <li><a href="#kontak">Kontak</a></li>
@@ -39,11 +40,27 @@
                 </p>
             </article>
 
-            <div class="card">
-                <h3>Cek Sisa Kursi</h3>
-                <p>Masih ada 40 kursi, 27 di antaranya sudah terisi.</p>
-                <button id="checkSeatBtn" type="button">Cek Sisa Kursi</button>
-            </div>
+        </section>
+
+        <section id="registration" class="registration-card" aria-labelledby="registrationTitle">
+            <h2 id="registrationTitle">Cek Ketersediaan Kursi</h2>
+
+            <form id="seatForm">
+                <label for="seatRequest">Jumlah kursi yang dibutuhkan</label>
+                <input
+                    id="seatRequest"
+                    name="seatRequest"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                >
+                <button type="submit">Cek Kursi</button>
+            </form>
+
+            <p id="seatMessage" class="status neutral" aria-live="polite">
+                Masukkan jumlah kursi lalu tekan Cek Kursi.
+            </p>
         </section>
 
         <section id="agenda">
