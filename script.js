@@ -1,90 +1,174 @@
-// Pertemuan 7 - logika kursi dari Pertemuan 6 dipindah ke antarmuka halaman
-// Kapasitas 40 kursi, 27 sudah terdaftar.
+// Pertemuan 8 - registrasi TechStarter Day disimpan di localStorage
+// Jumlah kursi terpakai dihitung dari daftar registrasi, bukan angka tetap.
 
-console.log("JavaScript Pertemuan 7 aktif");
+const STORAGE_KEY = "techstarter.registrations.v1";
+const MAX_SEATS = 40;
 
-const eventName = "TechStarter Day";
-const maxSeats = 40;
-let registered = 27;
-
-console.log(eventName);
-console.log(maxSeats);
-console.log(registered);
-
-const remaining = maxSeats - registered;
-console.log(`Sisa kursi: ${remaining}`);
-
-// Cek apakah permintaan masih bisa dilayani tanpa mengubah state.
-function checkSeats(requested) {
-    const remaining = maxSeats - registered;
-
-    if (!Number.isInteger(requested) || requested <= 0) {
-        return "Masukkan jumlah kursi berupa bilangan bulat lebih dari 0.";
-    }
-
-    if (requested <= remaining) {
-        return `Tersedia. Sisa saat ini ${remaining} kursi.`;
-    }
-
-    return `Tidak cukup. Hanya tersisa ${remaining} kursi.`;
-}
-
-// Versi yang benar-benar menambah state registered.
-function registerSeats(requested) {
-    const remaining = maxSeats - registered;
-
-    if (!Number.isInteger(requested) || requested <= 0) {
-        return "Input tidak valid.";
-    }
-
-    if (requested > remaining) {
-        return `Gagal. Hanya tersisa ${remaining} kursi.`;
-    }
-
-    registered = registered + requested;
-    return `Berhasil. Total terdaftar sekarang ${registered}.`;
-}
-
-// Selector: ambil elemen dari DOM sebelum dipakai.
-const seatForm = document.querySelector("#seatForm");
+const registrationForm = document.querySelector("#registrationForm");
+const participantNameInput = document.querySelector("#participantName");
 const seatRequestInput = document.querySelector("#seatRequest");
 const seatMessage = document.querySelector("#seatMessage");
+const registrationList = document.querySelector("#registrationList");
+const registrationSummary = document.querySelector("#registrationSummary");
+const cancelEditButton = document.querySelector("#cancelEdit");
 
-console.log(seatForm);
-console.log(seatRequestInput);
-console.log(seatMessage);
+// State: satu-satunya sumber data yang dipakai untuk render.
+let registrations = loadRegistrations();
+let editingId = null;
 
-// Satu pintu untuk mengubah teks dan class status.
+console.log("JavaScript Pertemuan 8 aktif");
+
+// ---------------------------------------------------------------- persistence
+function loadRegistrations() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (raw === null) {
+        return [];
+    }
+
+    try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        console.error("Data localStorage tidak valid:", error);
+        return [];
+    }
+}
+
+function saveRegistrations() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(registrations));
+}
+
+// ---------------------------------------------------------------- helper
+function getUsedSeats(excludeId) {
+    return registrations.reduce(function (total, item) {
+        if (item.id === excludeId) {
+            return total;
+        }
+        return total + item.seats;
+    }, 0);
+}
+
 function setStatus(message, type) {
     seatMessage.textContent = message;
     seatMessage.classList.remove("neutral", "success", "error");
     seatMessage.classList.add(type);
 }
 
-// Listener dipasang di form, bukan di tombol, supaya Enter ikut memproses.
-seatForm.addEventListener("submit", function (event) {
-    // Form punya perilaku bawaan reload. Dihentikan dulu.
+// ---------------------------------------------------------------- render
+function renderRegistrations() {
+    registrationList.replaceChildren();
+
+    if (registrations.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "registration-empty";
+        empty.textContent = "Belum ada registrasi.";
+        registrationList.append(empty);
+    }
+
+    for (const item of registrations) {
+        const li = document.createElement("li");
+        li.className = "registration-item";
+
+        const label = document.createElement("span");
+        label.textContent = `${item.name} : ${item.seats} kursi`;
+
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.textContent = "Edit";
+        editButton.addEventListener("click", function () {
+            startEdit(item);
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "delete-button";
+        deleteButton.textContent = "Hapus";
+        deleteButton.addEventListener("click", function () {
+            deleteRegistration(item.id);
+        });
+
+        li.append(label, editButton, deleteButton);
+        registrationList.append(li);
+    }
+
+    const used = getUsedSeats();
+    registrationSummary.textContent =
+        `${registrations.length} registrasi • ${used}/${MAX_SEATS} kursi terpakai • sisa ${MAX_SEATS - used} kursi`;
+}
+
+// ---------------------------------------------------------------- CRUD
+function deleteRegistration(id) {
+    registrations = registrations.filter(function (item) {
+        return item.id !== id;
+    });
+    saveRegistrations();
+    renderRegistrations();
+    setStatus("Registrasi dihapus.", "success");
+}
+
+function startEdit(item) {
+    editingId = item.id;
+    participantNameInput.value = item.name;
+    seatRequestInput.value = item.seats;
+    cancelEditButton.hidden = false;
+    participantNameInput.focus();
+    setStatus("Mode edit aktif. Ubah data lalu tekan Simpan Registrasi.", "neutral");
+}
+
+function stopEdit() {
+    editingId = null;
+    cancelEditButton.hidden = true;
+    registrationForm.reset();
+    setStatus("Mode edit dibatalkan.", "neutral");
+}
+
+registrationForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const rawValue = seatRequestInput.value;
-    const requested = Number(rawValue);
-    const remaining = maxSeats - registered;
+    const name = participantNameInput.value.trim();
+    const seats = Number(seatRequestInput.value);
 
-    console.log(rawValue, typeof rawValue, requested, typeof requested);
-
-    if (!Number.isInteger(requested) || requested <= 0) {
-        setStatus("Masukkan jumlah kursi bulat lebih dari 0.", "error");
+    if (name.length < 2) {
+        setStatus("Nama minimal 2 karakter.", "error");
         return;
     }
 
-    if (requested <= remaining) {
-        setStatus(checkSeats(requested), "success");
-    } else {
-        setStatus(checkSeats(requested), "error");
+    if (!Number.isInteger(seats) || seats <= 0) {
+        setStatus("Jumlah kursi harus bilangan bulat positif.", "error");
+        return;
     }
+
+    // Saat mengedit, kursi record yang sedang diedit tidak boleh dihitung dua kali.
+    const usedWithoutCurrent = getUsedSeats(editingId);
+
+    if (usedWithoutCurrent + seats > MAX_SEATS) {
+        setStatus(`Kursi tidak mencukupi. Sisa ${MAX_SEATS - usedWithoutCurrent} kursi.`, "error");
+        return;
+    }
+
+    if (editingId === null) {
+        registrations.push({ id: Date.now(), name: name, seats: seats });
+        setStatus("Registrasi ditambahkan.", "success");
+    } else {
+        const index = registrations.findIndex(function (item) {
+            return item.id === editingId;
+        });
+
+        if (index !== -1) {
+            registrations[index] = { ...registrations[index], name: name, seats: seats };
+        }
+
+        editingId = null;
+        cancelEditButton.hidden = true;
+        setStatus("Registrasi diperbarui.", "success");
+    }
+
+    saveRegistrations();
+    renderRegistrations();
+    registrationForm.reset();
 });
 
-// Setiap perubahan input mengembalikan status ke netral.
-seatRequestInput.addEventListener("input", function () {
-    setStatus("Nilai berubah. Tekan Cek Kursi untuk memeriksa.", "neutral");
-});
+cancelEditButton.addEventListener("click", stopEdit);
+
+renderRegistrations();

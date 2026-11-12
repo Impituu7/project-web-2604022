@@ -214,3 +214,88 @@ section p {
     color: #9b1c1c;
     background: #fdecec;
 }
+
+#registrationForm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+#registrationForm label {
+    flex: 1 1 100%;
+    font-weight: 700;
+}
+
+#registrationForm input {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #9aa7b4;
+    border-radius: 8px;
+    font: inherit;
+}
+
+#registrationForm #participantName {
+    flex: 1 1 260px;
+}
+
+#registrationForm #seatRequest {
+    width: 7rem;
+}
+
+#registrationForm button,
+.registration-item button {
+    padding: 0.55rem 1rem;
+    border: 0;
+    border-radius: 8px;
+    background: #17365d;
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#registrationForm button:hover,
+.registration-item button:hover {
+    background: #0f2745;
+}
+
+#cancelEdit {
+    background: #6b7280;
+}
+
+#registrationSummary {
+    font-weight: 700;
+    color: #17365d;
+}
+
+#registrationList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.registration-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #e5eaf1;
+}
+
+.registration-item span {
+    flex: 1 1 220px;
+}
+
+.registration-item button {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.registration-item .delete-button {
+    background: #9b1c1c;
+}
+
+.registration-item .delete-button:hover {
+    background: #7f1616;
+}

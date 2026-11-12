@@ -43,10 +43,19 @@
         </section>
 
         <section id="registration" class="registration-card" aria-labelledby="registrationTitle">
-            <h2 id="registrationTitle">Cek Ketersediaan Kursi</h2>
+            <h2 id="registrationTitle">Registrasi Peserta</h2>
 
-            <form id="seatForm">
-                <label for="seatRequest">Jumlah kursi yang dibutuhkan</label>
+            <form id="registrationForm">
+                <label for="participantName">Nama peserta</label>
+                <input
+                    id="participantName"
+                    name="participantName"
+                    type="text"
+                    maxlength="60"
+                    required
+                >
+
+                <label for="seatRequest">Jumlah kursi</label>
                 <input
                     id="seatRequest"
                     name="seatRequest"
@@ -55,12 +64,18 @@
                     step="1"
                     required
                 >
-                <button type="submit">Cek Kursi</button>
+
+                <button type="submit" id="submitRegistration">Simpan Registrasi</button>
+                <button type="button" id="cancelEdit" hidden>Batal Edit</button>
             </form>
 
             <p id="seatMessage" class="status neutral" aria-live="polite">
-                Masukkan jumlah kursi lalu tekan Cek Kursi.
+                Belum ada registrasi.
             </p>
+
+            <h3>Daftar Registrasi</h3>
+            <p id="registrationSummary">0 registrasi &bull; 0/40 kursi terpakai &bull; sisa 40 kursi</p>
+            <ul id="registrationList"></ul>
         </section>
 
         <section id="agenda">
