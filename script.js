@@ -1,5 +1,5 @@
 // Pertemuan 8 - registrasi TechStarter Day disimpan di localStorage
-// Jumlah kursi terpakai dihitung dari daftar registrasi, bukan angka tetap.
+// Pertemuan 9 - direktori mentor diambil dari API memakai fetch dan async/await
 
 const STORAGE_KEY = "techstarter.registrations.v1";
 const MAX_SEATS = 40;
@@ -16,7 +16,7 @@ const cancelEditButton = document.querySelector("#cancelEdit");
 let registrations = loadRegistrations();
 let editingId = null;
 
-console.log("JavaScript Pertemuan 8 aktif");
+console.log("JavaScript Pertemuan 9 aktif");
 
 // ---------------------------------------------------------------- persistence
 function loadRegistrations() {
@@ -172,3 +172,67 @@ registrationForm.addEventListener("submit", function (event) {
 cancelEditButton.addEventListener("click", stopEdit);
 
 renderRegistrations();
+
+// ---------------------------------------------------------------- Pertemuan 9
+// Endpoint publik latihan. URL disimpan di satu tempat supaya mudah diganti.
+const MENTOR_API_URL = "https://jsonplaceholder.typicode.com/users?_limit=5";
+
+const mentorSection = document.querySelector("#mentorSection");
+const mentorStatus = document.querySelector("#mentorStatus");
+const mentorList = document.querySelector("#mentorList");
+const reloadMentorsButton = document.querySelector("#reloadMentors");
+
+// Data dari luar diperlakukan sebagai data, bukan HTML.
+function renderMentors(users) {
+    mentorList.replaceChildren();
+
+    users.forEach(function (user) {
+        const card = document.createElement("article");
+        card.className = "mentor-card";
+
+        const name = document.createElement("h3");
+        name.textContent = user.name;
+
+        const company = document.createElement("p");
+        company.textContent = `Company: ${user.company.name}`;
+
+        const email = document.createElement("p");
+        email.textContent = `Email: ${user.email}`;
+
+        card.append(name, company, email);
+        mentorList.append(card);
+    });
+}
+
+async function loadMentors() {
+    mentorStatus.textContent = "Memuat data mentor...";
+    mentorStatus.className = "";
+    mentorList.replaceChildren();
+
+    try {
+        const response = await fetch(MENTOR_API_URL);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const users = await response.json();
+
+        if (!Array.isArray(users) || users.length === 0) {
+            mentorStatus.textContent = "Belum ada mentor untuk ditampilkan.";
+            return;
+        }
+
+        renderMentors(users);
+        mentorStatus.textContent = `${users.length} mentor berhasil dimuat.`;
+        mentorStatus.className = "status-success";
+    } catch (error) {
+        console.error("Gagal memuat mentor:", error);
+        mentorStatus.textContent = "Data mentor gagal dimuat. Periksa jaringan lalu coba lagi.";
+        mentorStatus.className = "status-error";
+    }
+}
+
+reloadMentorsButton.addEventListener("click", loadMentors);
+
+loadMentors();

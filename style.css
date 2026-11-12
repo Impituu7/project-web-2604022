@@ -299,3 +299,60 @@ section p {
 .registration-item .delete-button:hover {
     background: #7f1616;
 }
+
+#mentorSection {
+    margin-top: 2rem;
+}
+
+.mentor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.mentor-card {
+    border: 1px solid #d9e2ec;
+    border-radius: 12px;
+    padding: 1rem;
+    background: white;
+}
+
+.mentor-card h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+    color: #17365d;
+}
+
+.mentor-card p {
+    margin: 0.15rem 0;
+    font-size: 0.92rem;
+    color: #374151;
+}
+
+#mentorStatus {
+    font-weight: 700;
+}
+
+.status-error {
+    color: #b42318;
+}
+
+.status-success {
+    color: #067647;
+}
+
+#reloadMentors {
+    padding: 0.55rem 1rem;
+    border: 1px solid #17365d;
+    border-radius: 8px;
+    background: white;
+    color: #17365d;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#reloadMentors:hover {
+    background: #eef2f8;
+}
